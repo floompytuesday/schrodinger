@@ -12,7 +12,7 @@ tf.enable_eager_execution()
 #default values
 c=1.0
 v=open('potential_energy.dat','r')
-basis_size=3
+basis_size=5
 domain=(0, 3*math.pi)
 
 def get_arguments():  #pragma: no cover
@@ -32,77 +32,45 @@ def create_potential_tensor(args):
     domain=tf.convert_to_tensor(array[:,0],dtype=tf.float32)
     return tensor,domain,test
 
-stuff=create_potential_tensor(args)
+potential=create_potential_tensor(args)
+delta_x=potential[1][1]-potential[1][0]
+def lambda_1(i):
+    return lambda x: 1 
+def lambda_sin(i):
+    return lambda x: math.sin(math.ceil(i/2)*x)
+def lambda_cos(i):
+    return lambda x: math.cos((i/2)*x)
 
 def basis_set(args):
     array=[None for i in range(args.basis_size)]
     for i in range(args.basis_size):
         if i==0:
-            array[i]=lambda x: 1
+            array[i]=lambda_1(i)
         elif i%2==1:
-            array[i]=lambda x: math.sin(math.ceil(i/2)*x)
+            array[i]=lambda_sin(i)
         else:
-            array[i]=lambda x: math.cos((i/2)*x)
+            array[i]=lambda_cos(i)
     return array
 basis=basis_set(args)
-def evaluate_basis(args,basis,stuff):
+def evaluate_basis(args,basis,potential):
     numerical=[[] for i in range(args.basis_size)]
     for i in range(len(basis)):
-        for j in range(len(stuff[2])):
-            numerical[i].append(basis[i](stuff[2][j]))
+        for j in range(len(potential[2])):
+            numerical[i].append(basis[i](potential[2][j]))
     tensor=tf.transpose(tf.convert_to_tensor(numerical))
     return tensor
-    
+num_basis=evaluate_basis(args,basis,potential)   
+def riemann_sum(tensor,delta=delta_x):
+    temp=tf.reduce_sum(tensor,axis=0)
+    return delta_x*temp
 
-print(evaluate_basis(args,basis,stuff))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''def hamiltonian(coefficients, V=v, C=c):
-    hammy=[V]+ [(i**2)*C*coefficients[i] for i in range(1, len(coefficients))]
-    return hammy'''
-
-'''def hamiltonian_mat(basis_size=basis_size, domain=domain, C=c, V=v):
-    k=domain[1] #symmetric around origin
-    empty_mat=[[] for i in range(basis_size)]
-    for i in range(basis_size):
-        for j in range(basis_size):
-            p1=2*v*math.sin(k*j)/k
-            if i==j:
-                if j==0:
-                    p2=0
-                else:
-                    p2=C*(j**2)*(k+math.sin(2*k*j)/(2*j))
-            else:
-                p2=0
-            empty_mat[i].append(p1+p2)
-    hmat=tf.convert_to_tensor(empty_mat)
-    return hmat'''
+def projection(potential, basis,args):
+    rhs=tf.Variable(riemann_sum(potential[0])*riemann_sum(basis))
+    lhs=[[] for i in range(args.basis_size)]
+    for i in range(args.basis_size):
+        temp=basis*basis[i]
+        lhs[i]=riemann_sum(temp)
+    lhs_t=tf.convert_to_tensor(lhs)
+    return tf.linalg.solve(lhs_t,tf.reshape(rhs,[args.basis_size,1]))
+print(projection(potential, num_basis, args))
 
