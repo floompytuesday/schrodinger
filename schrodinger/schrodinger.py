@@ -12,7 +12,7 @@ tf.enable_eager_execution()
 #default values
 c=1.0
 v=open('potential_energy.dat','r')
-basis_size=5
+basis_size=3
 domain=(0, 3*math.pi)
 
 def get_arguments():  #pragma: no cover
@@ -65,12 +65,20 @@ def riemann_sum(tensor,delta=delta_x):
     return delta_x*temp
 
 def projection(potential, basis,args):
-    rhs=tf.Variable(riemann_sum(potential[0])*riemann_sum(basis))
+    rhs=tf.Variable(riemann_sum(potential[0])*riemann_sum(num_basis))
     lhs=[[] for i in range(args.basis_size)]
     for i in range(args.basis_size):
         temp=basis*basis[i]
         lhs[i]=riemann_sum(temp)
     lhs_t=tf.convert_to_tensor(lhs)
     return tf.linalg.solve(lhs_t,tf.reshape(rhs,[args.basis_size,1]))
-print(projection(potential, num_basis, args))
+proj=projection(potential, num_basis,args)
+
+def hamiltonian(args, projection):
+    hammy=tf.Variable(tf.zeros(shape=[args.basis_size,args.basis_size])) #placeholder
+    hammy=tf.add(hammy,projection)
+    return hammy
+
+print(projection(potential,num_basis, args))
+
 
