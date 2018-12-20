@@ -23,9 +23,8 @@ before_install:
 - pip install tensorflow 
 
 # Command to run tests, e.g. python setup.py test
-script: 
-- coverage run --source=schrodinger setup.py pytest
-- coverage report -m 
+
+
 
 after_success:  coveralls
 # Assuming you have installed the travis-ci CLI tool, after you
