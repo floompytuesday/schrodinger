@@ -16,7 +16,9 @@ schrodinger
 
 
 
-schrodinger in python 
+schrodinger in python. Inputs are the constant c, the number of elements in the basis set, the domain, and the potential energy as a table.
+All can be given as command line arguments.  Default values for these variables can be found in the source code. The program can be run by executing "python schrodinger.py" in the correct directory. 
+The program will output the basis set coefficients that correspond to the lowest energy state of the hamiltonian.
 
 
 * Free software: MIT license
