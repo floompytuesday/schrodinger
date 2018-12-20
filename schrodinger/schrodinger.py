@@ -98,6 +98,6 @@ potential_=create_potential_tensor(args)
 num_basis=evaluate_basis(args,basis,potential_)
 proj=projection(potential_,num_basis,args)
 hammy=hamiltonian(args,proj)
-print(hammy)
+print('the coefficients to the basis set for the lowest energy are {}'.format(eigen(hammy)))
 
 

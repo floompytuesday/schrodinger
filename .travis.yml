@@ -1,5 +1,4 @@
 # Config file for automatic testing at travis-ci.org
-
 language: python
 python:
   - 3.6
@@ -8,7 +7,8 @@ python:
   - 2.7
 
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
-install: #pip install -U tox-travis
+install: 
+- pip install -U tox-travis
 - pip install coveralls
 - python setup.py install
 
@@ -23,7 +23,8 @@ before_install:
 - pip install tensorflow 
 
 # Command to run tests, e.g. python setup.py test
-script: - coverage run --source=schrodinger setup.py test
+script: 
+- coverage run --source=schrodinger setup.py test
 - coverage report -m 
 
 after_success:  coveralls

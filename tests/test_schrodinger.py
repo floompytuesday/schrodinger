@@ -126,3 +126,22 @@ def test_hammy():
     tf.assert_equal(a, tf.Variable([[ 4.7123923e+00,  4.7123923e+00,  4.7123923e+00],
  [-2.3561995e+01, -2.3561995e+01, -2.3561995e+01],
  [-3.0745832e+07, -3.0745832e+07, -3.0745832e+07]]))
+
+def test_eigh():   
+    class args:
+        def __init__():
+            pass
+        c=1.0
+        v=open('potential_energy.dat','r')
+        basis_size=3
+        domain=(0, 3*math.pi)
+
+
+    basis=schrodinger.basis_set(args)
+    potential=schrodinger.create_potential_tensor(args)
+    num_basis=schrodinger.evaluate_basis(args,basis,potential)
+    proj=schrodinger.projection(potential,num_basis,args)
+    hammy=schrodinger.hamiltonian(args,proj)
+    a=schrodinger.eigen(hammy)
+    tf.assert_equal(a,tf.Variable([-0.4082483,  -0.7071067,  -0.57735044]))
+
